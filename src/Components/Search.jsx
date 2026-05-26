@@ -20,13 +20,16 @@ function Search() {
       setIsError(null)
       return 
     }
-    
+    const controller = new AbortController();
+
     const FetchSearch = async () => {
       try {
         setIsLoading(true)
         setIsError(null)
         let res = await fetch(
-          `https://dummyjson.com/products/search?q=${trimmed}`
+          `https://dummyjson.com/products/search?q=${trimmed}`,{
+            signal: controller.signal
+          }
         )
         let data = await res.json()
         console.log(data?.products)
@@ -36,8 +39,10 @@ function Search() {
         }
         setResults(data?.products || [])
       } catch (error) {
-        console.error(error)
-        setIsError(error.message)
+        if (error.name !== 'AbortError') {
+          console.log(error)
+          setIsError(error.message)
+        }
       } finally {
         setIsLoading(false)
       }
@@ -50,6 +55,7 @@ function Search() {
 
     return ()=>{
       clearTimeout(timerID);
+      controller.abort();
     }
 
   }, [query])
