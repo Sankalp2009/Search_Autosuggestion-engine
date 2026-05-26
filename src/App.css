@@ -41,3 +41,7 @@ h1 {
 
   transition: all 0.25s ease;
 }
+.search_wrapper{
+  margin: auto;
+  margin-top: 1%;
+}
