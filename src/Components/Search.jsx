@@ -2,19 +2,19 @@
 import { useState, useEffect, useRef } from 'react'
 import SearchInput from './SearchInput'
 import SuggestionDisplay from './SuggestionDisplay'
-SuggestionDisplay
 function Search() {
   // Raja ke alag alag khajane ko chupane ke liye sandook (state)
 
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(null)
   const cache = useRef({});
   // API Handling
   useEffect(() => {
     const trimmed = encodeURIComponent(query.trim())
-    if (!trimmed && trimmed.length < 2) {
+    if (!trimmed || trimmed.length < 2) {
       setResults([])
       setIsLoading(false)
       setIsError(null)
@@ -73,16 +73,57 @@ function Search() {
   }, [query])
 
   return (
-    <div>
-      {/* Kabootar ke liye Dana bhejo papa ke ghr se (props)*/}
+    <div className="search_page">
+    <div className="search_card">
+  
       <SearchInput query={query} setQuery={setQuery} />
+  
       {isLoading && <h2>Loading</h2>}
+  
       {isError && <h2>{isError}</h2>}
-      {!isLoading && query && results.length === 0 && <h2>No Results Found</h2>}
-      <div className="search_wrapper">
-        <SuggestionDisplay data={results} />
-      </div>
+  
+      {!isLoading && query && results.length === 0 && (
+        <h2>No Results Found</h2>
+      )}
+  
+      <SuggestionDisplay
+        data={results}
+        setSelectedProduct={setSelectedProduct}
+      />
+  
+      {
+        selectedProduct && (
+          <div className="selected_product">
+  
+            <div className="selected_image">
+              <img
+                src={selectedProduct.thumbnail}
+                alt={selectedProduct.title}
+              />
+            </div>
+  
+            <div className="selected_info">
+              <h2>{selectedProduct.title}</h2>
+  
+              <p className="selected_desc">
+                {selectedProduct.description}
+              </p>
+  
+              <div className="selected_meta">
+                <span>${selectedProduct.price}</span>
+  
+                <span>
+                  ★ {selectedProduct.rating}
+                </span>
+              </div>
+            </div>
+  
+          </div>
+        )
+      }
+  
     </div>
+  </div>
   )
 }
 
