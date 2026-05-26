@@ -46,7 +46,7 @@ function Search() {
     // Optimization
     const timerID = setTimeout(() => {
       FetchSearch()
-    }, 500);
+    }, 300);
 
     return ()=>{
       clearTimeout(timerID);
