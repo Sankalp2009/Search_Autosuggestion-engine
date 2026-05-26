@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import SearchInput from './SearchInput'
 import SuggestionDisplay from './SuggestionDisplay'
 SuggestionDisplay
@@ -10,7 +10,7 @@ function Search() {
   const [results, setResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(null)
-
+  const cache = useRef({});
   // API Handling
   useEffect(() => {
     const trimmed = encodeURIComponent(query.trim())
@@ -26,6 +26,14 @@ function Search() {
       try {
         setIsLoading(true)
         setIsError(null)
+
+        // Cache Check
+        if(cache.current[trimmed]){
+          setResults(cache.current[trimmed])
+          setIsLoading(false);
+          return
+        }
+
         let res = await fetch(
           `https://dummyjson.com/products/search?q=${trimmed}`,{
             signal: controller.signal
@@ -37,6 +45,10 @@ function Search() {
         if (!data?.products) {
           throw new Error('Data Not Found')
         }
+
+        // Store the Cache or already check results
+        cache.current[trimmed] = data?.products || [];
+
         setResults(data?.products || [])
       } catch (error) {
         if (error.name !== 'AbortError') {
